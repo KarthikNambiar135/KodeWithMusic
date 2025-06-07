@@ -1,0 +1,131 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 80px;
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.3);
+  flex-direction: column;
+  justify-content: center; /* center icons vertically */
+  align-items: center;
+  backdrop-filter: blur(20px);     /* the blur effect */
+  z-index: 1000;             
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  animation: navbarSlideIn 0.6s ease-out 0.2s both;
+}
+
+.nav-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.nav-icon {
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  animation: iconBounce 0.6s ease-out both;
+}
+
+.nav-icon:nth-child(1) { animation-delay: 0.4s; }
+.nav-icon:nth-child(2) { animation-delay: 0.5s; }
+.nav-icon:nth-child(3) { animation-delay: 0.6s; }
+.nav-icon:nth-child(4) { animation-delay: 0.7s; }
+
+.diamond {
+  width: 35px;
+  height: 35px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(220, 50, 70, 0.3);
+}
+
+.diamond svg {
+  width: 20px;
+  height: 20px;
+  transform: rotate(-45deg);
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.3s ease;
+}
+
+.nav-icon:hover .diamond {
+  background: rgba(220, 50, 70, 0.2);
+  border-color: rgba(220, 50, 70, 0.6);
+  transform: rotate(25deg) scale(1.1);
+  box-shadow: 0 0 20px rgba(220, 50, 70, 0.3);
+}
+
+.nav-icon:hover .diamond svg {
+  color: rgba(220, 50, 70, 1);
+}
+
+.nav-icon.active .diamond {
+  background: linear-gradient(45deg, #ff0096, #00ffff);
+  box-shadow: 0 0 20px rgba(255, 0, 150, 0.5);
+}
+
+.nav-icon.active {
+  background: rgba(255, 0, 150, 0.2);
+  border: 1px solid rgba(255, 0, 150, 0.5);
+}
+
+.nav-icon.active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff0096, #00ffff);
+  border-radius: 14px;
+  z-index: -1;
+  opacity: 0.3;
+  filter: blur(5px);
+}
+
+@keyframes navbarSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+
+  50% {
+        opacity: 0.5;
+        transform: translateX(-50px);
+    }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes iconBounce {
+  0% {
+    opacity: 0;
+    transform:  translateY(20px);
+  }
+  50% {
+    transform:  translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform:  translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-label {
+    font-size: 0.7rem;
+  }
+  
+  .nav-icon {
+    padding: 0.8rem;
+    gap: 0.3rem;
+  }
+}

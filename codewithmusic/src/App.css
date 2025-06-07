@@ -1,0 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d1b1b 100%);
+  color: white;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.logo-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  z-index: 9999;
+}
+
+.logo-animation {
+  position: relative;
+  font-size: 4rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.letter-k {
+  animation: kRotateAndMirror 2s ease-in-out forwards;
+  transform-origin: center;
+  position: relative;
+  z-index: 2;
+}
+
+.rest-letters {
+  opacity: 0;
+  transform: translateX(-100px);
+  animation: slideOut 1s ease-out 1.5s forwards;
+}
+
+.neon-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(220, 50, 70, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  animation: neonGlow 1s ease-out 2.5s forwards;
+}
+
+@keyframes kRotateAndMirror {
+  0% {
+    transform: rotate(0deg) scaleX(1);
+  }
+  50% {
+    transform: rotate(180deg) scaleX(1);
+  }
+  100% {
+    transform: rotate(180deg) scaleX(-1);
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes neonGlow {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.app {
+  display: flex;
+}
+
+.content {
+  margin-left: 80px; /* pushes content right to avoid navbar overlap */
+  padding: 2rem;
+  padding-bottom: 120px; /* Adds space for music player */
+}
+
+/* Coming soon pages styling */
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.coming-soon h2 {
+  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #ff0096, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.coming-soon p {
+  color: #b3b3b3;
+  font-size: 1.2rem;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+/* Enhanced play overlay for playlist tiles */
+.tile {
+  position: relative;
+  overflow: hidden;
+}
+
+.tile .play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.tile:hover .play-overlay {
+  opacity: 1;
+}
+
+.tile .play-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff0096, #00ffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(255, 0, 150, 0.4);
+}
+
+.tile .play-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 15px 40px rgba(255, 0, 150, 0.6);
+}
+
+.tile .play-button svg {
+  width: 24px;
+  height: 24px;
+  color: white;
+  margin-left: 3px;
+}
+
+/* Smooth transitions for navigation */
+.content {
+  transition: all 0.3s ease;
+}
+
+/* Enhanced library section styling */
+.library-section {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.library-tiles .tile {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.library-tiles .tile:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.playlist-description {
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Animation for fade in up effect */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced empty states */
+.empty-library {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 40vh;
+  text-align: center;
+  color: #666;
+}
+
+.empty-library p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .coming-soon h2 {
+    font-size: 2rem;
+  }
+  
+  .coming-soon p {
+    font-size: 1rem;
+  }
+  
+  .tile .play-button {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .tile .play-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}
