@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(3f)ypnhbei3h)+nol)%_3)626vg%(4#%+j!x*%#(b3sm0(o6_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://kodewithmusic-backend.onrender.com']
 
 # CORS settings for React frontend
 CORS_ALLOWED_ORIGINS = [
