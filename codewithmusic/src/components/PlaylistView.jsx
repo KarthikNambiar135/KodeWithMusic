@@ -8,7 +8,7 @@ function PlaylistView({ playlist, onSongClick, onBack }) {
 
   useEffect(() => {
     if (playlist && playlist.id) {
-      fetch(`http://localhost:8000/api/playlist/${playlist.id}/songs/`)
+      fetch(`https://kodewithmusic-backend.onrender.com/api/playlist/${playlist.id}/songs/`)
         .then(res => {
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
@@ -73,7 +73,7 @@ function PlaylistView({ playlist, onSongClick, onBack }) {
               key={song.id} 
               className="song-row" 
               style={{ animationDelay: `${index * 0.05}s` }}
-              onClick={() => onSongClick(song, index)}
+              onClick={() => onSongClick(song, index, songs)}
             >
               <div className="song-number">{index + 1}</div>
               <img src={song.cover} alt={song.title} className="song-cover" />

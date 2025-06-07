@@ -2,18 +2,22 @@ import React, { useRef, useEffect, useState } from 'react';
 import './Player.css';
 
 const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }) => {
+  const progressRef = useRef(null);
   const audioRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7); //Default 70%
   const [isDragging, setIsDragging] = useState(false);
-
-
+  
   useEffect(() => { 
     if (audioRef.current) {
       audioRef.current.volume = volume;
       if (isPlaying) {
-        audioRef.current.play().catch(console.error);
+        audioRef.current.play().catch(err => {
+        if (err.name !== "AbortError") {
+          console.error("Playback error:", err);
+        }
+      });
       } else {
         audioRef.current.pause();
       }
@@ -34,45 +38,76 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }
     }
   };
 
-  const handleSeek = (e) => {
-  if (!audioRef.current || !duration || isNaN(duration) || duration <= 0) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, offsetX / rect.width));
-    const newTime = percentage * duration;
+  // const handleSeek = (e) => {
+  // if (!audioRef.current || isNaN(audioRef.current.duration) || audioRef.current.readyState < 1) return;
 
-    if (!isFinite(newTime) || newTime < 0) return;
+  //   const rect = e.currentTarget.getBoundingClientRect();
+  //   const offsetX = e.clientX - rect.left;
+  //   const percentage = Math.max(0, Math.min(1, offsetX / rect.width));
+  //   const newTime = percentage * audioRef.current.duration;
 
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
+  //   if (!isFinite(newTime) || newTime < 0) return;
+
+  //   audioRef.current.currentTime = newTime;
+  //   setCurrentTime(newTime);
+  // };
 
   const handleMouseDown = (e) => {
-    if (duration && isFinite(duration) && duration > 0) {
-      setIsDragging(true);
-      handleSeek(e);
-    }
+    if (!duration || isNaN(duration)) return;
+    setIsDragging(true);
+    seekToPosition(e);
   };
 
   const handleMouseMove = (e) => {
     if (isDragging) {
-      handleSeek(e);
+      seekToPosition(e);
+      handleTimeUpdate();
     }
   };
 
   const handleMouseUp = () => {
+    if (isDragging) {
     setIsDragging(false);
+  }
   };
+
+  const seekToPosition = (e) => {
+    if (!progressRef.current || !duration) return;
+    const rect = progressRef.current.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const width = rect.width;
+    const percent = Math.max(0, Math.min(1, offsetX / width));
+    const newTime = percent * duration;
+
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
+
+    setCurrentTime(newTime);
+};
 
   //Global mouse up listener when dragging
   useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+    if (isDragging) seekToPosition(e);
+  };
+  const handleGlobalMouseUp = () => {
     if (isDragging) {
-      const handleGlobalMouseUp = () => setIsDragging(false);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-      return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
+      setIsDragging(false);
+      handleTimeUpdate(); // Ensure UI reflects new time
     }
-  }, [isDragging]);
+  };
+     if (isDragging) {
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+  }
+
+  return () => {
+    document.removeEventListener('mousemove', handleGlobalMouseMove);
+    document.removeEventListener('mouseup', handleGlobalMouseUp);
+  };
+}, [isDragging]);
 
   const handleVolumeChange = (e) => {
     const vol = parseFloat(e.target.value) / 100;
@@ -154,10 +189,11 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }
         <span className="time">{formatTime(currentTime)}</span>
        <div 
           className="progress" 
+          ref={progressRef}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: duration > 0 ? "pointer" : "not-allowed" }}
         >
           <div className="progress-fill" style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}></div>
         </div>
@@ -168,7 +204,6 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }
         src={currentSong.audio_file}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        autoPlay
       />
     </div>
 

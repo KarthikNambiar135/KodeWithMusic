@@ -40,7 +40,7 @@ const fetchData = () => {
   setLoading(true);
   setError(null);
 
-    fetch('http://localhost:8000/api/home/')
+    fetch('https://kodewithmusic-backend.onrender.com/api/home/')
           .then(res => {
             if (!res.ok) {
               throw new Error(`HTTP error! status: ${res.status}`);
@@ -135,7 +135,7 @@ useEffect(() => {
         <h2>Recently Played</h2>
         <div className="songs-grid">
           {data.recentSongs.map((song, index) => (
-            <div key={song.id} className="song-item" style={{ animationDelay: `${(index + 10) * 0.1}s` }} onClick={() => onSongClick(song, index)}>
+            <div key={song.id} className="song-item" style={{ animationDelay: `${(index + 10) * 0.1}s` }} onClick={() => onSongClick(song, index, data.recentSongs)}>
               <img src={song.cover} alt={song.title} />
               <div className="song-info">
                 <h4>{song.title}</h4>

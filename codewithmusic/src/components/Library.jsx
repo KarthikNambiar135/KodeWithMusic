@@ -7,7 +7,7 @@ function Library({ onPlaylistClick }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/library/')
+    fetch('https://kodewithmusic-backend.onrender.com/api/library/')
       .then(res => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);

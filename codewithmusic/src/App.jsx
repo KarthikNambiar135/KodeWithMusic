@@ -57,10 +57,10 @@ function App() {
   };
 
   //Music player handlers
-  const handleSongClick = (song, index) => {
+  const handleSongClick = (song, index, songsList = [song]) => {
     setCurrentSong(song);
     setCurrentIndex(index);
-    setPlaylist([song]); //we can also pass the full playlist here if needed
+    setPlaylist(songsList); //we can also pass the full playlist here if needed
     setIsPlaying(true);
   };
 
