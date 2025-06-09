@@ -32,11 +32,17 @@ ALLOWED_HOSTS = ['kodewithmusic-backend.onrender.com', 'localhost',]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # React dev server
     "http://127.0.0.1:3000",
-    "https://kode-with-music.vercel.app/", # Vercel deployment
+    "https://kode-with-music.vercel.app", # Vercel deployment
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_ALL_ORIGINS = True  # For development
+CORS_ALLOW_HEADERS = [
+    'accept', 'accept-encoding', 'authorization', 'content-type', 
+    'dnt', 'origin', 'user-agent', 'x-csrftoken', 'x-requested-with', 'range',
+    'cache-control', 'pragma',
+]
 
 
 # Application definition

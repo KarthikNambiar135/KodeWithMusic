@@ -10,6 +10,126 @@
   animation: fadeInUp 0.8s ease-out 0.3s both;
 }
 
+.noti-btn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.noti-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.notification-popup {
+  position: fixed;
+  top: 80px;
+  right: 30px;
+  width: 300px;
+  background: linear-gradient(135deg, #1f1f1f, #2a2a2a);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+  z-index: 1000;
+  animation: popupIn 0.6s ease forwards;
+  transform-style: preserve-3d;
+  perspective: 600px;
+}
+
+.notification-popup h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #dc3246;
+}
+
+.notification-popup ul {
+  padding-left: 20px;
+  margin: 0;
+  list-style-type: disc;
+}
+
+.notification-popup li {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-popup.centered {
+  position: relative;
+  width: 320px;
+  background: linear-gradient(145deg, #1f1f1f, #2a2a2a);
+  color: white;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  animation: popupInCenter 0.6s ease forwards;
+  transform-style: preserve-3d;
+  perspective: 600px;
+}
+
+@keyframes popupInCenter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotateX(-15deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateX(0);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.close-btn:hover {
+  transform: rotate(90deg) scale(1.3);
+  color: #dc3246;
+}
+
+@keyframes popupIn {
+  0% {
+    opacity: 0;
+    transform: rotateX(-30deg) translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg) translateY(0);
+  }
+}
+
+
 .app-title {
   font-size: 3rem;
   font-weight: 700;

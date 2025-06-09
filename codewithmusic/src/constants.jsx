@@ -1,0 +1,1 @@
+export const GLOBAL_ENDPOINT = "https://kodewithmusic-backend.onrender.com/api";

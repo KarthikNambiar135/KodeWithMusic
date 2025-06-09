@@ -10,4 +10,19 @@ urlpatterns = [
     path('api/recommended/', views.RecommendedPlaylistsView.as_view(), name='recommended'),
     path('api/recent-songs/', views.RecentSongsView.as_view(), name='recent_songs'),
     path('api/track-play/', views.track_song_play, name='track_play'),
+    path('api/search/', views.search_data, name='search_data'),
+    # Song customization endpoints
+    path('api/songs/', views.get_all_songs, name='get_all_songs'),
+    path('api/playlists/', views.get_playlists, name='get_playlists'),
+    
+    # Custom clip endpoints
+    path('api/create-clip/', views.create_clip, name='create_clip'),
+    path('api/custom-clips/', views.get_custom_clips, name='get_custom_clips'),
+    path('api/clips/<int:clip_id>/delete/', views.delete_clip, name='delete_clip'),
+    
+    # Mix endpoints
+    path('api/create-mix/', views.create_mix, name='create_mix'),
+    path('api/mixes/', views.get_user_mixes, name='get_user_mixes'),
+    path('api/mixes/<int:mix_id>/delete/', views.delete_mix, name='delete_mix'),
+    path('api/preload-songs/', views.preload_songs, name='preload_songs'),
 ]

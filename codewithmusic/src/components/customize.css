@@ -1,0 +1,550 @@
+/* Tabs */
+.customize-tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.clip-marker {
+  cursor: grab;
+  z-index: 10;
+}
+
+.clip-marker:hover {
+  width: 5px;
+  transform: translateX(-50%) scale(1.2);
+}
+
+.clip-marker:active {
+  cursor: grabbing;
+}
+
+.search-input-container {
+  position: relative;
+}
+
+.tab-button.active,
+.tab-button:hover {
+  color: white;
+  border-bottom-color: #dc3246;
+}
+
+/* Edit Section */
+.edit-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.songs-list h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.songs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.song-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.song-item:hover,
+.song-item.selected {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(220, 50, 70, 0.3);
+  transform: translateX(5px);
+}
+
+.song-item img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  margin-right: 12px;
+}
+
+.song-info h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 3px;
+  color: white;
+}
+
+.song-info p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Editor Panel */
+.editor-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.editor-panel h2 {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.play-button {
+  background: #dc3246;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.play-button:hover {
+  background: #b82a3a;
+}
+
+.time-display {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+/* Waveform Container */
+.waveform-container {
+  margin: 20px 0;
+}
+
+.progress-bar {
+  position: relative;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #dc3246;
+  border-radius: 20px;
+  transition: width 0.1s ease;
+}
+
+.clip-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: #00ff41;
+  transform: translateX(-50%);
+}
+
+.start-marker {
+  background: #00ff41;
+}
+
+.end-marker {
+  background: #ff4757;
+}
+
+.clip-range {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+}
+
+/* Controls */
+.clip-controls {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.control-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.control-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #dc3246;
+}
+
+.save-clip {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.clip-name-input {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.clip-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.playlist-select {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.save-button {
+  background: #dc3246;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #b82a3a;
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Clips Section */
+.clips-section {
+  animation: fadeInUp 0.6s ease-out;
+  padding: 20px;
+}
+
+.clips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.clip-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.clip-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+.clip-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.clip-info h4 {
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.clip-info p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 3px;
+}
+
+.clip-duration {
+  color: #dc3246 !important;
+  font-weight: 500;
+}
+
+.add-to-mix-button {
+  background: rgba(220, 50, 70, 0.2);
+  border: 1px solid #dc3246;
+  color: #dc3246;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.add-to-mix-button:hover {
+  background: #dc3246;
+  color: white;
+}
+
+/* Mix Section */
+.mix-section {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.mix-builder {
+  max-width: 600px;
+}
+
+.mix-name-input {
+  width: 100%;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+.mix-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.mix-tracks h3 {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 15px;
+}
+
+.mix-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.track-number {
+  font-weight: 600;
+  color: #dc3246;
+  min-width: 20px;
+}
+
+.mix-track img {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.track-info {
+  flex: 1;
+}
+
+.track-info h4 {
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+  color: white;
+}
+
+.track-info p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.remove-button {
+  background: rgba(255, 75, 87, 0.2);
+  border: 1px solid #ff4757;
+  color: #ff4757;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.remove-button:hover {
+  background: #ff4757;
+  color: white;
+}
+
+.save-mix-button {
+  background: #dc3246;
+  border: none;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 20px;
+  transition: background 0.3s ease;
+}
+
+.save-mix-button:hover:not(:disabled) {
+  background: #b82a3a;
+}
+
+.save-mix-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .edit-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .clips-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .save-clip {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .clip-controls {
+    flex-direction: column;
+  }
+}
+
+/* Add these styles to your Customize.css file */
+
+/* Playlist Select Dropdown Styling */
+.playlist-select-dropdown {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  min-width: 200px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.playlist-select-dropdown:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.playlist-select-dropdown:focus {
+  outline: none;
+  border-color: #dc3246;
+  box-shadow: 0 0 0 2px rgba(220, 50, 70, 0.2);
+}
+
+.playlist-select-dropdown option {
+  background: #1a1a1a;
+  color: white;
+  padding: 8px;
+}
+
+.playlist-select-dropdown option:hover {
+  background: #2a2a2a;
+}
+
+/* Clip Actions Button Styling */
+.clip-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.play-clip-btn {
+  background: linear-gradient(135deg, #000000, #582626 ,#a44141) !important;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.play-clip-btn:hover {
+  background: linear-gradient(135deg, #e2e2d9, #aa5192) !important;
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: linear-gradient(135deg, #c82333, #a71e2a) !important;
+}
+
+/* Clip Item Enhanced Styling */
+.clip-item {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.clip-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.clip-info h4 {
+  margin-bottom: 4px;
+  color: white;
+  font-weight: 600;
+}
+
+.clip-info p {
+  margin: 2px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}

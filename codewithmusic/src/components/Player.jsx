@@ -1,113 +1,178 @@
+// Updated Player.jsx with fixes
 import React, { useRef, useEffect, useState } from 'react';
 import './Player.css';
+import { GLOBAL_ENDPOINT } from '../constants';
 
-const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }) => {
+const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong, playlist }) => {
   const progressRef = useRef(null);
   const audioRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7); //Default 70%
+  const [volume, setVolume] = useState(0.7);
   const [isDragging, setIsDragging] = useState(false);
-  
-  useEffect(() => { 
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-      if (isPlaying) {
-        audioRef.current.play().catch(err => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [canPlay, setCanPlay] = useState(false);
+  const preloadedAudioRef = useRef([]);
+
+
+  useEffect(() => {
+  const storedVolume = localStorage.getItem("volume");
+  if (storedVolume) setVolume(parseFloat(storedVolume));
+}, []);
+
+useEffect(() => {
+  localStorage.setItem("volume", volume);
+}, [volume]);
+
+  const preloadSongs = async (songIds) => {
+  try {
+    const response = await fetch(`${GLOBAL_ENDPOINT}/preload-songs/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ song_ids: songIds }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      // Store preloaded audio elements in a ref
+      preloadedAudioRef.current = data.songs.map(song => {
+        const audio = new Audio();
+        audio.preload = 'auto';
+        audio.src = song.audio_file;
+        return audio;
+      });
+    }
+  } catch (error) {
+    console.error('Preload error:', error);
+  }
+};
+
+
+
+
+  // Preload audio when song changes
+  useEffect(() => {
+  if (currentSong?.audio_file && audioRef.current) {
+    setIsLoading(true);
+    setCanPlay(false);
+    setCurrentTime(0);
+    setDuration(0);
+    
+    const audio = audioRef.current;
+    
+    // Reset audio element
+    audio.pause();
+    audio.currentTime = 0;
+    
+    // Set new source and load
+    audio.src = currentSong.audio_file;
+    audio.preload = 'auto';
+    audio.load();
+  }
+}, [currentSong]);
+
+  // Handle play/pause after audio is ready
+  useEffect(() => {
+  if (audioRef.current && canPlay) {
+    audioRef.current.volume = volume;
+    if (isPlaying) {
+      audioRef.current.play().catch(err => {
         if (err.name !== "AbortError") {
           console.error("Playback error:", err);
         }
       });
-      } else {
-        audioRef.current.pause();
-      }
+    } else {
+      audioRef.current.pause();
     }
-  }, [isPlaying, currentSong]);
+  }
+}, [isPlaying, canPlay, volume]);
+
+useEffect(() => {
+  // Preload current playlist
+  if (playlist.length > 0) {
+    const songIds = playlist.map(song => song.id);
+    preloadSongs(songIds);
+  }
+}, [playlist]);
 
   const formatTime = (seconds) => {
-    if (!seconds || !isFinite(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
-    return `${mins}:${secs}`;
-  };
+  if (!seconds || !isFinite(seconds) || seconds < 0) return '0:00';
+  const totalSeconds = Math.floor(seconds);
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
 
   const handleTimeUpdate = () => {
     if (!isDragging && audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
-      setDuration(audioRef.current.duration || 0);
     }
   };
 
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration || 0);
+      setCurrentTime(0);
+    }
+  };
 
-  // const handleSeek = (e) => {
-  // if (!audioRef.current || isNaN(audioRef.current.duration) || audioRef.current.readyState < 1) return;
+  const handleCanPlay = () => {
+    setIsLoading(false);
+    setCanPlay(true);
+  };
 
-  //   const rect = e.currentTarget.getBoundingClientRect();
-  //   const offsetX = e.clientX - rect.left;
-  //   const percentage = Math.max(0, Math.min(1, offsetX / rect.width));
-  //   const newTime = percentage * audioRef.current.duration;
+  const handleLoadStart = () => {
+    setIsLoading(true);
+    setCanPlay(false);
+  };
 
-  //   if (!isFinite(newTime) || newTime < 0) return;
+  const seekToPosition = (e) => {
+  if (!progressRef.current || !duration || !canPlay || !audioRef.current) return;
+  
+  const rect = progressRef.current.getBoundingClientRect();
+  const offsetX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+  const percent = offsetX / rect.width;
+  const newTime = percent * duration;
 
-  //   audioRef.current.currentTime = newTime;
-  //   setCurrentTime(newTime);
-  // };
+  if (isFinite(newTime) && newTime >= 0 && newTime <= duration) {
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  }
+};
 
   const handleMouseDown = (e) => {
-    if (!duration || isNaN(duration)) return;
+    if (!duration || !canPlay) return;
     setIsDragging(true);
     seekToPosition(e);
   };
 
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      seekToPosition(e);
-      handleTimeUpdate();
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (isDragging) {
-    setIsDragging(false);
-  }
-  };
-
-  const seekToPosition = (e) => {
-    if (!progressRef.current || !duration) return;
-    const rect = progressRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const width = rect.width;
-    const percent = Math.max(0, Math.min(1, offsetX / width));
-    const newTime = percent * duration;
-
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
-    }
-
-    setCurrentTime(newTime);
-};
-
-  //Global mouse up listener when dragging
+  // Global mouse event handlers
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
-    if (isDragging) seekToPosition(e);
-  };
-  const handleGlobalMouseUp = () => {
-    if (isDragging) {
-      setIsDragging(false);
-      handleTimeUpdate(); // Ensure UI reflects new time
-    }
-  };
-     if (isDragging) {
-    document.addEventListener('mousemove', handleGlobalMouseMove);
-    document.addEventListener('mouseup', handleGlobalMouseUp);
-  }
+      if (isDragging) {
+        seekToPosition(e);
+      }
+    };
 
-  return () => {
-    document.removeEventListener('mousemove', handleGlobalMouseMove);
-    document.removeEventListener('mouseup', handleGlobalMouseUp);
-  };
-}, [isDragging]);
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+      }
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, duration, canPlay]);
 
   const handleVolumeChange = (e) => {
     const vol = parseFloat(e.target.value) / 100;
@@ -117,14 +182,7 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }
     }
   };
 
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration || 0);
-      setCurrentTime(0);
-    }
-  };  
-
-  if (!currentSong || !currentSong.cover || !currentSong.artist) return null;
+  if (!currentSong?.cover || !currentSong?.artist) return null;
   
   return (
     <div className="music-player">
@@ -138,24 +196,31 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }
         </div>
         
         <div className="player-controls">
-          <button className="control-btn shuffle" >
+          <button className="control-btn shuffle">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
             </svg>
           </button>
           <button className="control-btn prev" onClick={prevSong}>
-            <svg viewBox="0 0 24 24" fill="currentColor" >
+            <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
             </svg>
           </button>
-          <button className="control-btn play" onClick={onPlayPause}>
-            {isPlaying ? (
-              //Pause icon
+          <button 
+            className="control-btn play" 
+            onClick={onPlayPause}
+            disabled={!canPlay}
+          >
+            {isLoading ? (
+              // Loading spinner
+              <svg viewBox="0 0 24 24" fill="currentColor" className="loading-spinner">
+                <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+              </svg>
+            ) : isPlaying ? (
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
               </svg>
             ) : (
-              //Play icon
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
@@ -180,34 +245,61 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, nextSong, prevSong }
             </svg>
           </button>
           <div className="volume-slider">
-            <input type="range" min="0" max="100" value={volume*100} onChange={handleVolumeChange}/>
+            <input 
+              type="range" 
+              min="0" 
+              max="100" 
+              value={volume * 100} 
+              onChange={handleVolumeChange}
+            />
           </div>
         </div>
       </div>
       
       <div className="progress-bar">
         <span className="time">{formatTime(currentTime)}</span>
-       <div 
+        <div 
           className="progress" 
           ref={progressRef}
           onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          style={{ cursor: duration > 0 ? "pointer" : "not-allowed" }}
+          style={{ 
+            cursor: canPlay && duration > 0 ? "pointer" : "not-allowed",
+            opacity: canPlay ? 1 : 0.5
+          }}
         >
-          <div className="progress-fill" style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}></div>
+          <div 
+            className="progress-fill" 
+            style={{ 
+              width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` 
+            }}
+          />
         </div>
         <span className="time">{formatTime(duration)}</span>
       </div>
+      
       <audio
         ref={audioRef}
         src={currentSong.audio_file}
+        preload="auto"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onCanPlay={handleCanPlay}
+        onLoadStart={handleLoadStart}
+        onError={(e) => {
+            console.error('Audio error:', e.target.error);
+            setIsLoading(false);
+            setCanPlay(false);
+          }}
+          onStalled={() => {
+            console.log('Audio stalled, retrying...');
+          }}
+          onWaiting={() => {
+            setIsLoading(true);
+        }}
       />
     </div>
-
   );
 };
+
 
 export default MusicPlayer;

@@ -1,5 +1,6 @@
-  import React, { useState, useEffect } from "react";
-  import "./Home.css";
+import React, { useState, useEffect } from "react";
+import "./Home.css";
+import { GLOBAL_ENDPOINT } from "../constants";
 
   // const quickAccessPlaylists = [
   //   { id: 1, title: "Liked Songs", count: "142 songs", cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop" },
@@ -26,6 +27,8 @@
   //   { id: 6, title: "Heat Waves", artist: "Glass Animals", duration: "3:58", cover: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300&h=300&fit=crop" }
   // ];
 
+let popupAlreadyShown = false;
+
 function Home({ onSongClick, onPlaylistClick }) {
   const [data, setData] = useState({
     quickAccess: [],
@@ -35,12 +38,14 @@ function Home({ onSongClick, onPlaylistClick }) {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showNotification, setShowNotification] = useState(false);
+
 
 const fetchData = () => {
   setLoading(true);
   setError(null);
 
-    fetch('https://kodewithmusic-backend.onrender.com/api/home/')
+    fetch(`${GLOBAL_ENDPOINT}/home/`)
           .then(res => {
             if (!res.ok) {
               throw new Error(`HTTP error! status: ${res.status}`);
@@ -65,7 +70,21 @@ const fetchData = () => {
 
 useEffect(() => {
   fetchData();
+
+  if (!popupAlreadyShown) {
+    setShowNotification(true);
+    popupAlreadyShown = true;
+  }
 }, []);
+
+// This effect toggles scroll lock
+useEffect(() => {
+  document.body.style.overflow = showNotification ? 'hidden' : 'auto';
+}, [showNotification]);
+
+const dismissNotification = () => {
+  setShowNotification(false);
+};
 
 
   if (loading) {
@@ -99,6 +118,7 @@ useEffect(() => {
         <h1 className="app-title">
           <span className="k-mirrored">K</span><span className="gradient-text">odeWithMusic</span>
         </h1>
+         <button className="noti-btn" onClick={() => setShowNotification(true)}>🔔</button>
       </header>
 
       <section className="quick-access">
@@ -109,7 +129,7 @@ useEffect(() => {
               <img src={playlist.cover} alt={playlist.title} />
               <div className="tile-info">
                 <h3>{playlist.title}</h3>
-                <p>{playlist.count}</p>
+                <p>{playlist.song_count} songs{playlist.clip_count > 0 ? ` • ${playlist.clip_count} clips` : ''}</p>
               </div>
             </div>
           ))}
@@ -147,6 +167,22 @@ useEffect(() => {
         </div>
       </section>
     </main>
+              {showNotification && (
+        <div className="notification-overlay">
+          <div className="notification-popup centered">
+            <button className="close-btn" onClick={dismissNotification}>×</button>
+            <h3>📢 Important Updates</h3>
+            <ul>
+              <li>Mix Feature in customization is not complete. You can create mixes, but cannot play it.</li>
+              <li>Sometimes clicking on any song or clip, brings the player but the playback won't start.</li>
+              <li>Temporary Fix: Just click on any other song or clip and then play the one you wanted again.</li>
+              <li>Shuffle, and Loop buttons are not functional yet.</li>
+              <li>In edit clips, i recommend using the set start and set end option instead of manual time input as it sometimes is buggy</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }

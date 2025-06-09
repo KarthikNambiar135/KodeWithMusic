@@ -4,6 +4,8 @@ import Home from "./components/Home";
 import MusicPlayer from "./components/Player";
 import Library from "./components/Library";
 import PlaylistView from "./components/PlaylistView";
+import Search from "./components/Search";
+import Customize from "./components/Customize";
 import "./App.css";
 
 function App() {
@@ -116,17 +118,17 @@ function App() {
         );
       case 'search':
         return (
-          <div className="main-content">
-            <header className="page-header">
-              <h1 className="app-title">
-                <span className="k-mirrored">K</span><span className="gradient-text">odeWithMusic</span>
-              </h1>
-            </header>
-            <div className="coming-soon">
-              <h2>Search</h2>
-              <p>Search functionality coming soon...</p>
-            </div>
-          </div>
+        <Search 
+          onSongClick={handleSongClick}
+          onPlaylistClick={handlePlaylistClick}
+        />
+      );
+      case 'customize':
+        return (
+          <Customize 
+            onBack={handleBackClick}
+            onSongClick={handleSongClick}
+          />
         );
       case 'account':
         return (
@@ -176,6 +178,7 @@ function App() {
         onPlayPause={handlePlayPause}
         nextSong={handleNext}
         prevSong={handlePrev}
+        playlist={playlist}
       />
     </div>
   );

@@ -89,6 +89,18 @@
   filter: blur(5px);
 }
 
+.navbar .search-icon {
+  pointer-events: auto !important;
+} 
+
+.navbar .nav-icon {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  pointer-events: auto;
+}
+
 @keyframes navbarSlideIn {
   0% {
     opacity: 0;

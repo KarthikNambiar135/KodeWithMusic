@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Home.css";
+import { GLOBAL_ENDPOINT } from "../constants";
 
 function Library({ onPlaylistClick }) {
   const [playlists, setPlaylists] = useState([]);
@@ -7,7 +8,7 @@ function Library({ onPlaylistClick }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('https://kodewithmusic-backend.onrender.com/api/library/')
+    fetch(`${GLOBAL_ENDPOINT}/library/`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
