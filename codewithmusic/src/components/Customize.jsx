@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Customize.css";
+import "./customize.css";
 import { GLOBAL_ENDPOINT } from "../constants";
 
 function Customize({onSongClick}) {
