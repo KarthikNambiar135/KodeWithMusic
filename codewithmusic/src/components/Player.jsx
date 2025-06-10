@@ -24,6 +24,23 @@ useEffect(() => {
   localStorage.setItem("volume", volume);
 }, [volume]);
 
+const preloadClips = async (clipIds) => {
+  try {
+    const response = await fetch(`${GLOBAL_ENDPOINT}/preload-clips/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clip_ids: clipIds })
+    });
+    const data = await response.json();
+    if (data.success) {
+      // Just store in memory if needed; or rely on browser caching
+      console.log("Clips preloaded:", data.preloaded_count);
+    }
+  } catch (err) {
+    console.error("Preload clips error:", err);
+  }
+};
+
   const preloadSongs = async (songIds) => {
   try {
     const response = await fetch(`${GLOBAL_ENDPOINT}/preload-songs/`, {
@@ -65,6 +82,7 @@ useEffect(() => {
     
     // Reset audio element
     audio.pause();
+    audio.removeAttribute('src');
     audio.currentTime = 0;
     
     // Set new source and load
@@ -73,6 +91,36 @@ useEffect(() => {
     audio.load();
   }
 }, [currentSong]);
+
+useEffect(() => {
+  if (audioRef.current && currentSong?.audio_file) {
+    const audio = audioRef.current;
+
+    const onLoadedMetadata = () => {
+      const fullDuration = audio.duration || 0;
+
+      if (currentSong.clipStart !== undefined && currentSong.clipEnd !== undefined) {
+        audio.currentTime = currentSong.clipStart; // ✅ Seek now that metadata is available
+        setDuration(currentSong.clipEnd - currentSong.clipStart);
+      } else if (typeof currentSong.duration === 'number') {
+        setDuration(currentSong.duration);
+      } else {
+        setDuration(fullDuration);
+      }
+
+      setCurrentTime(0);
+      setCanPlay(true);
+      setIsLoading(false);
+    };
+
+    audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    return () => {
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+    };
+  }
+}, [currentSong]);
+
+
 
   // Handle play/pause after audio is ready
   useEffect(() => {
@@ -91,12 +139,28 @@ useEffect(() => {
 }, [isPlaying, canPlay, volume]);
 
 useEffect(() => {
-  // Preload current playlist
+  // Preload current playlist (only for regular songs, not clips)
   if (playlist.length > 0) {
-    const songIds = playlist.map(song => song.id);
-    preloadSongs(songIds);
+    const songIds = playlist
+      .filter(song => !song.clipStart && !song.clipEnd) // Only regular songs
+      .map(song => song.id);
+    
+    const clipIds = playlist
+      .filter(song => song.clipStart !== undefined && song.clipEnd !== undefined)
+      .map(song => song.id);
+
+    if (songIds.length > 0) {
+      preloadSongs(songIds);
+    }
+
+    if (clipIds.length > 0) {
+      preloadClips(clipIds); // NEW
+    }
   }
 }, [playlist]);
+
+
+
 
   const formatTime = (seconds) => {
   if (!seconds || !isFinite(seconds) || seconds < 0) return '0:00';
@@ -106,11 +170,29 @@ useEffect(() => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-  const handleTimeUpdate = () => {
-    if (!isDragging && audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
+const handleTimeUpdate = () => {
+  if (!isDragging && audioRef.current) {
+    const current = audioRef.current.currentTime;
+    
+    // For clips, handle end time
+    if (currentSong?.clipEnd !== undefined && current >= currentSong.clipEnd) {
+      audioRef.current.pause();
+      onPlayPause(); // Use the prop function to update parent state
+      return;
     }
-  };
+
+    // Calculate display time
+    if (currentSong?.clipStart !== undefined) {
+      // For clips, show time relative to clip start
+      const effectiveCurrent = Math.max(0, current - currentSong.clipStart);
+      setCurrentTime(effectiveCurrent);
+    } else {
+      // For regular songs
+      setCurrentTime(current);
+    }
+  }
+};
+
 
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
@@ -119,10 +201,17 @@ useEffect(() => {
     }
   };
 
-  const handleCanPlay = () => {
-    setIsLoading(false);
-    setCanPlay(true);
-  };
+const handleCanPlay = () => {
+  setIsLoading(false);
+  setCanPlay(true);
+  
+  // if (audioRef.current) {
+  //   // For clips, set the start time
+  //   if (currentSong?.clipStart !== undefined) {
+  //     audioRef.current.currentTime = currentSong.clipStart;
+  //   }
+  // }
+};
 
   const handleLoadStart = () => {
     setIsLoading(true);

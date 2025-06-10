@@ -86,11 +86,12 @@ class CustomClipSerializer(serializers.ModelSerializer):
     artist = serializers.CharField(source='original_song.artist.name', read_only=True)
     cover = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
+    audio_file = serializers.SerializerMethodField()
     
     class Meta:
         model = CustomClip
         fields = ['id', 'name', 'original_song', 'artist', 'start_time', 'end_time', 
-                 'cover', 'duration', 'created_at']
+          'cover', 'duration', 'created_at', 'audio_file']
     
     def get_cover(self, obj):
         request = self.context.get('request')
@@ -100,6 +101,12 @@ class CustomClipSerializer(serializers.ModelSerializer):
     
     def get_duration(self, obj):
         return obj.duration()
+    
+    def get_audio_file(self, obj):
+        request = self.context.get('request')
+        if obj.original_song.audio_file and request:
+            return request.build_absolute_uri(obj.original_song.audio_file.url)
+        return None
 
 class MixTrackSerializer(serializers.ModelSerializer):
     clip = CustomClipSerializer(read_only=True)

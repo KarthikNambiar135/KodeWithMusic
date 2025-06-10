@@ -25,4 +25,5 @@ urlpatterns = [
     path('api/mixes/', views.get_user_mixes, name='get_user_mixes'),
     path('api/mixes/<int:mix_id>/delete/', views.delete_mix, name='delete_mix'),
     path('api/preload-songs/', views.preload_songs, name='preload_songs'),
+    path('api/preload-clips/', views.preload_clips, name='preload_clips'),
 ]

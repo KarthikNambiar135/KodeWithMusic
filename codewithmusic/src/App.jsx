@@ -60,10 +60,13 @@ function App() {
 
   //Music player handlers
   const handleSongClick = (song, index, songsList = [song]) => {
-    setCurrentSong(song);
-    setCurrentIndex(index);
+    setIsPlaying(false);
+    setTimeout(() => {
     setPlaylist(songsList); //we can also pass the full playlist here if needed
+    setCurrentIndex(index);
+    setCurrentSong(song); 
     setIsPlaying(true);
+  }, 50); // slight delay to ensure state updates correctly
   };
 
   const handlePlayPause = () => {

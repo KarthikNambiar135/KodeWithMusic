@@ -334,6 +334,10 @@ const handlePlaylistClick = async (playlist) => {
 };
 
 const handleClipPlay = (clip) => {
+  if (!clip.audio_file) {
+    alert("Clip audio not available. Please try again.");
+    return;
+  }
   // Create a song object that matches the expected format for the player
   const songForPlayer = {
     id: clip.id,
@@ -341,7 +345,9 @@ const handleClipPlay = (clip) => {
     artist: { name: clip.artist },
     cover: clip.cover,
     audio_file: clip.audio_file, // Make sure your backend provides this
-    duration: clip.duration
+    duration: clip.duration,
+    clipStart: clip.start_time,
+    clipEnd: clip.end_time
   };
   
   // Call the onSongClick prop to play the clip

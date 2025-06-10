@@ -54,6 +54,27 @@ def preload_songs(request):
             'error': str(e),
             'success': False
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['POST'])
+def preload_clips(request):
+    """Preload clips by returning audio metadata and original song URL"""
+    try:
+        clip_ids = request.data.get('clip_ids', [])
+        if not clip_ids:
+            return Response({'error': 'clip_ids required'}, status=400)
+
+        clips = CustomClip.objects.filter(id__in=clip_ids).select_related('original_song__artist')
+        serializer = CustomClipSerializer(clips, many=True, context={'request': request})
+
+        return Response({
+            'clips': serializer.data,
+            'success': True,
+            'preloaded_count': len(clips)
+        })
+
+    except Exception as e:
+        return Response({'error': str(e), 'success': False}, status=500)
+
 
 @api_view(['GET'])
 def home_data(request):
