@@ -36,6 +36,7 @@ class Playlist(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    sort_order = models.PositiveIntegerField(default=0)
     
     def song_count(self):
         return self.songs.count()

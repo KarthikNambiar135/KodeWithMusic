@@ -402,3 +402,98 @@ section h2 {
 .retry-button:hover {
   background-color: #2980b9;
 }
+
+.drag-handle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: grab;
+  z-index: 10;
+  opacity: 0.6;
+}
+.drag-handle:hover {
+  opacity: 1;
+}
+
+.new-playlist-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.new-playlist-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #dc3246;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: linear-gradient(135deg, #1f1f1f, #2a2a2a);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  color: white;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.modal h2 {
+  margin-bottom: 20px;
+}
+
+.modal input,
+.modal textarea {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal button {
+  padding: 8px 16px;
+  background: #dc3246;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal button:hover {
+  background: #b71c2c;
+}
+
+.modal .cancel-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.modal input::placeholder,
+.modal textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}

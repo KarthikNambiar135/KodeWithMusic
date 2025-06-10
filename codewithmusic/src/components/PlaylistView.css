@@ -273,3 +273,145 @@
     display: none;
   }
 }
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.add-songs-btn {
+  background: #99323e;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-right: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.add-songs-btn:hover {
+  background: #dc3246;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 50, 70, 0.3);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #1f1f1f;
+  padding: 20px;
+  border-radius: 12px;
+  max-height: 80vh;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+  margin: 0 15px; /* Add horizontal breathing room on small screens */
+}
+
+.modal-overlay {
+  overflow-x: hidden;
+}
+
+
+.modal-song-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  border-top: 1px solid #333;
+  margin-top: 10px;
+}
+
+.load-more-btn {
+  background: #1db954;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: #1ed760;
+}
+
+.load-more-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.modal-song-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.modal-song-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  margin-right: 10px;
+}
+
+.modal-search {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 1rem;
+}
+.modal-search::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: white;
+}

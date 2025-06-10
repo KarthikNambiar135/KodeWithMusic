@@ -2,11 +2,193 @@ import React, { useState, useEffect } from "react";
 import "./PlaylistView.css";
 import { GLOBAL_ENDPOINT } from "../constants";
 
+function ClipPickerModal({ onClose, onAdd, currentClips }) {
+  const [clips, setClips] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    fetch(`${GLOBAL_ENDPOINT}/custom-clips/`)
+      .then(res => res.json())
+      .then(data => {
+        setClips(data.clips || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error loading clips:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredClips = clips
+    .filter(c => !currentClips.find(existing => existing.id === c.id))
+    .filter(c =>
+      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.original_song.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal">
+        <div className="modal-header">
+          <h2>Select Clips</h2>
+          <button className="modal-close-btn" onClick={onClose}>×</button>
+        </div>
+        
+        <input
+          type="text"
+          placeholder="Search clips..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="modal-search"
+        />
+        
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="modal-song-list">
+            {filteredClips.map(clip => (
+              <div key={clip.id} className="modal-song-item">
+                <img src={clip.cover} alt={clip.name} />
+                <div className="song-info">
+                  <h4>{clip.name}</h4>
+                  <p>{clip.original_song}</p>
+                </div>
+                <button onClick={() => onAdd(clip)}>Add</button>
+              </div>
+            ))}
+            
+            {filteredClips.length === 0 && !loading && (
+              <p>No clips found.</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+function SongPickerModal({ onClose, onAdd, currentSongs }) {
+  const [allSongs, setAllSongs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const PAGE_SIZE = 10;
+
+  // Load initial songs
+  useEffect(() => {
+    loadSongs(1, true);
+  }, []);
+
+  const loadSongs = async (pageNum, reset = false) => {
+    try {
+      if (pageNum === 1) {
+        setLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const response = await fetch(`${GLOBAL_ENDPOINT}/songs/?page=${pageNum}&limit=${PAGE_SIZE}`);
+      const data = await response.json();
+
+      if (reset) {
+        setAllSongs(data.results || []);
+      } else {
+        setAllSongs(prev => [...prev, ...(data.results || [])]);
+      }
+
+      setHasMore(!!data.next);
+      setPage(pageNum);
+    } catch (error) {
+      console.error("Error loading songs:", error);
+    } finally {
+      setLoading(false);
+      setIsLoadingMore(false);
+    }
+  };
+
+  const loadMoreSongs = () => {
+    if (hasMore && !isLoadingMore) {
+      loadSongs(page + 1);
+    }
+  };
+
+  const filteredSongs = allSongs
+    .filter(song => !currentSongs.find(s => s.id === song.id))
+    .filter(song => {
+      const term = searchTerm.toLowerCase();
+      return (
+        song.title.toLowerCase().includes(term) ||
+        song.artist.name.toLowerCase().includes(term)
+      );
+    });
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal">
+        <div className="modal-header">
+          <h2>Select Songs</h2>
+          <button className="modal-close-btn" onClick={onClose}>×</button>
+        </div>
+        
+        <input
+          type="text"
+          placeholder="Search songs..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="modal-search"
+        />
+
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="modal-song-list">
+            {filteredSongs.map(song => (
+              <div key={song.id} className="modal-song-item">
+                <img src={song.cover} alt={song.title} />
+                <div className="song-info">
+                  <h4>{song.title}</h4>
+                  <p>{song.artist.name}</p>
+                </div>
+                <button onClick={() => onAdd(song)}>Add</button>
+              </div>
+            ))}
+            
+            {filteredSongs.length === 0 && !loading && (
+              <p>No songs found.</p>
+            )}
+
+            {/* Load More Button - only show if we have more pages and not searching */}
+            {hasMore && !searchTerm && (
+              <div className="load-more-container">
+                <button 
+                  className="load-more-btn" 
+                  onClick={loadMoreSongs}
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? 'Loading...' : 'Load More Songs'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function PlaylistView({ playlist, onSongClick, onBack }) {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clips, setClips] = useState([]);
+  const [showSongPicker, setShowSongPicker] = useState(false);
+  const [showClipPicker, setShowClipPicker] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     if (playlist && playlist.id) {
@@ -60,6 +242,12 @@ function PlaylistView({ playlist, onSongClick, onBack }) {
         <div className="playlist-info">
           <img src={playlist.cover} alt={playlist.title} className="playlist-cover" />
           <div className="playlist-details">
+            <button className="add-songs-btn" onClick={() => setShowSongPicker(true)}>
+              + Add Songs
+            </button>
+            <button className="add-songs-btn" onClick={() => setShowClipPicker(true)}>
+              + Add Clips
+            </button>
             <h1>{playlist.title}</h1>
             <p className="playlist-meta">
                {playlist.song_count} songs{playlist.clip_count > 0 ? ` • ${playlist.clip_count} clips` : ''}
@@ -70,6 +258,51 @@ function PlaylistView({ playlist, onSongClick, onBack }) {
           </div>
         </div>
       </header>
+
+       {showSongPicker && (
+  <SongPickerModal
+    currentSongs={songs}
+    onClose={() => setShowSongPicker(false)}
+    onAdd={(song) => {
+      fetch(`${GLOBAL_ENDPOINT}/playlist/${playlist.id}/add-song/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ song_id: song.id })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setSongs(prev => [...prev, song]);
+          } else {
+            alert("Failed to add song");
+          }
+        });
+    }}
+  />
+)}
+
+{showClipPicker && (
+  <ClipPickerModal
+    currentClips={clips}
+    onClose={() => setShowClipPicker(false)}
+    onAdd={(clip) => {
+      fetch(`${GLOBAL_ENDPOINT}/playlist/${playlist.id}/add-clip/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clip_id: clip.id })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setClips(prev => [...prev, clip]);
+          } else {
+            alert("Failed to add clip");
+          }
+        });
+    }}
+  />
+)}
+
 
       <section className="playlist-songs">
         <div className="songs-list">
@@ -151,6 +384,8 @@ function PlaylistView({ playlist, onSongClick, onBack }) {
     ))}
   </div>
 )}  
+       
+
       </section>
     </main>
   );

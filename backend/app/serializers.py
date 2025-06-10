@@ -54,7 +54,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Playlist
-        fields = ['id', 'title', 'description', 'cover', 'artist', 'playlist_type', 'clip_count', 'song_count']
+        fields = ['id', 'title', 'description', 'cover', 'artist', 'playlist_type', 'clip_count', 'song_count', 'sort_order']
 
     
     def get_cover(self, obj):

@@ -728,20 +728,23 @@ const moveTrack = (fromIndex, direction) => {
   <section className="clips-section">
     <h2>My Custom Clips</h2>
     <div className="clips-grid">
-      {customClips.map((clip) => (
-        <div key={clip.id} className="clip-item">
-          <img src={clip.cover} alt={clip.name} />
+      {customClips.map((clip, index) => (
+        <div key={clip.id} className="clip-item" style={{ animationDelay: `${index * 0.05}s` }}>
+           <div className="clip-number">{index + 1}</div>
+          <img src={clip.cover} alt={clip.name} className="clip-cover"/>
           <div className="clip-info">
-            <h4>{clip.name}</h4>
-            <p>{clip.original_song} - {clip.artist}</p>
-            <p>Duration: {formatTime(clip.duration)}</p>
+            <h4 className="clip-title">{clip.name}</h4>
+            <p className="clip-artist">{clip.original_song} - {clip.artist}</p>
+            <p className="clip-duration">Duration: {formatTime(clip.duration)}</p>
           </div>
           <div className="clip-actions">
             <button 
               onClick={() => handleClipPlay(clip)}
-              className="control-button play-clip-btn"
+              className="play-clip-btn"
             >
-              ▶Play
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
             </button>
             <button 
               onClick={() => addToMix(clip)}

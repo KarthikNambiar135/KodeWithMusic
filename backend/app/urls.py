@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/quick-access/', views.QuickAccessPlaylistsView.as_view(), name='quick_access'),
     path('api/library/', views.library_data, name='library_data'),
     path('api/playlist/<int:playlist_id>/songs/', views.playlist_songs, name='playlist_songs'),
+    path('api/playlists/', views.get_playlists, name='get_playlists'),
     path('api/recommended/', views.RecommendedPlaylistsView.as_view(), name='recommended'),
     path('api/recent-songs/', views.RecentSongsView.as_view(), name='recent_songs'),
     path('api/track-play/', views.track_song_play, name='track_play'),
@@ -26,4 +27,7 @@ urlpatterns = [
     path('api/mixes/<int:mix_id>/delete/', views.delete_mix, name='delete_mix'),
     path('api/preload-songs/', views.preload_songs, name='preload_songs'),
     path('api/preload-clips/', views.preload_clips, name='preload_clips'),
+    path('api/update-playlist-order/', views.update_playlist_order, name='update_playlist_order'),
+    path('api/playlist/<int:playlist_id>/add-song/', views.add_song_to_playlist),
+    path('api/playlist/<int:playlist_id>/add-clip/', views.add_clip_to_playlist),
 ]

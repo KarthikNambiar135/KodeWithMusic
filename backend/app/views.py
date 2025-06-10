@@ -12,6 +12,8 @@ from .serializers import CustomClipSerializer, MixSerializer
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from rest_framework.pagination import PageNumberPagination
+
 
 # Helper function to get user for testing
 def get_user_for_request(request):
@@ -75,6 +77,21 @@ def preload_clips(request):
     except Exception as e:
         return Response({'error': str(e), 'success': False}, status=500)
 
+@api_view(['POST'])
+def update_playlist_order(request):
+    """Update the sort order of playlists"""
+    try:
+        playlist_ids = request.data.get('playlist_ids', [])
+        if not playlist_ids or not isinstance(playlist_ids, list):
+            return Response({'error': 'Invalid playlist_ids'}, status=400)
+
+        for index, playlist_id in enumerate(playlist_ids):
+            Playlist.objects.filter(id=playlist_id).update(sort_order=index)
+
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
 
 @api_view(['GET'])
 def home_data(request):
@@ -114,7 +131,7 @@ def home_data(request):
 def library_data(request):
     try:
         #Get all playlists for library view
-        all_playlists = Playlist.objects.all().order_by('-created_at')
+        all_playlists = Playlist.objects.all().order_by('sort_order', 'created_at')  # ✅ New
         serializer = PlaylistSerializer(all_playlists, many=True, context={'request': request})
         
         return Response({
@@ -254,39 +271,75 @@ def search_data(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class StandardPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'limit'
+
 @api_view(['GET'])
 def get_all_songs(request):
     """Get all songs for the customize page"""
     try:
         songs = Song.objects.all().select_related('artist')
-        serializer = SongSerializer(songs, many=True, context={'request': request})
-        
-        return Response({
-            'songs': serializer.data,
-            'success': True
-        })
+        paginator = StandardPagination()
+        result_page = paginator.paginate_queryset(songs, request)
+        serializer = SongSerializer(result_page, many=True, context={'request': request})
+        return paginator.get_paginated_response(serializer.data)
     except Exception as e:
-        return Response({
-            'error': str(e),
-            'success': False
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['GET'])
-def get_playlists(request):
-    """Get all playlists for selection"""
+        return Response({'error': str(e), 'success': False}, status=500)
+    
+@csrf_exempt
+@api_view(['POST'])
+def add_clip_to_playlist(request, playlist_id):
     try:
-        playlists = Playlist.objects.all()
-        serializer = PlaylistSerializer(playlists, many=True, context={'request': request})
-        
-        return Response({
-            'playlists': serializer.data,
-            'success': True
-        })
+        clip_id = request.data.get('clip_id')
+        if not clip_id:
+            return Response({'error': 'clip_id required'}, status=400)
+
+        clip = CustomClip.objects.get(id=clip_id)
+        playlist = Playlist.objects.get(id=playlist_id)
+
+        clip.playlist = playlist
+        clip.save()
+
+        return Response({'success': True})
     except Exception as e:
-        return Response({
-            'error': str(e),
-            'success': False
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def get_playlists(request):
+    if request.method == 'GET':
+        playlists = Playlist.objects.all().order_by('sort_order')
+        serializer = PlaylistSerializer(playlists, many=True, context={'request': request})
+        return Response({'playlists': serializer.data, 'success': True})
+
+    if request.method == 'POST':
+        user = get_user_for_request(request)
+        title = request.data.get('title')
+        playlist_type = request.data.get('playlist_type', 'user')
+        is_public_raw = request.data.get('is_public', True)
+        if isinstance(is_public_raw, str):
+            is_public = is_public_raw.lower() == 'true'
+        else:
+            is_public = bool(is_public_raw)
+        description = request.data.get('description', '')
+        cover_image = request.FILES.get('cover_image')
+
+        if not title:
+            return Response({'error': 'Title is required'}, status=400)
+
+        playlist = Playlist.objects.create(
+            title=title,
+            playlist_type=playlist_type,
+            is_public=is_public,
+            created_by=user,
+            description=description,
+            cover_image=cover_image
+        )
+
+        serializer = PlaylistSerializer(playlist, context={'request': request})
+        return Response({'playlist': serializer.data, 'success': True})
 
 @csrf_exempt
 @api_view(['POST'])
@@ -506,3 +559,18 @@ def delete_mix(request, mix_id):
             'error': str(e),
             'success': False
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+def add_song_to_playlist(request, playlist_id):
+    try:
+        song_id = request.data.get('song_id')
+        if not song_id:
+            return Response({'error': 'song_id required'}, status=400)
+
+        playlist = Playlist.objects.get(id=playlist_id)
+        song = Song.objects.get(id=song_id)
+        playlist.songs.add(song)
+
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
