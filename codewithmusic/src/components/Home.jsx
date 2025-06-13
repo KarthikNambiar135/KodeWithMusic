@@ -173,7 +173,8 @@ const dismissNotification = () => {
             <button className="close-btn" onClick={dismissNotification}>×</button>
             <h3>📢 Important Updates</h3>
             <ul>
-              <li>Clip Feture works, but it sometimes may cause bugs when you try playing it from My Clips.</li>
+              <li>This Project is in its Beta State.</li>
+              <li>Clip Feature works, but it sometimes may cause bugs when you try playing it from My Clips.</li>
               <li>Mix Feature in customization is not complete. You can create mixes, but cannot play it.</li>
               <li>Sometimes clicking on any song or clip, brings the player but the playback won't start.</li>
               <li>Temporary Fix: Just click on any other song or clip and then play the one you wanted again.</li>
