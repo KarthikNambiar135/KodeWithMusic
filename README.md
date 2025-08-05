@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # KodeWithMusic 🎵💻
 
 Where coding meets creativity - an innovative platform that harmonizes programming and music for an enhanced development experience.  
