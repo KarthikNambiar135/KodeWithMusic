@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # KodeWithMusic 🎵💻
 
 Where coding meets creativity - an innovative platform that harmonizes programming and music for an enhanced development experience.  
@@ -16,3 +17,6 @@ The platform combines intuitive design with powerful functionality, offering use
 
 ![KodeWithMusic](screenshots/image2.png)     
 ![KodeWithMusic](screenshots/image.png)
+=======
+DEMO: https://kode-with-music.vercel.app/
+>>>>>>> aecd25ccbf95e4d9280541700469a4072031bf4d
